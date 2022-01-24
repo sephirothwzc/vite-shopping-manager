@@ -22,6 +22,7 @@ const Home = () => {
   return () => (
     <Layout class="layout">
       <LayoutSider
+        class="layout-sider"
         breakpoint="lg"
         collapsed-width="0"
         onCollapse={onCollapse}
@@ -48,9 +49,9 @@ const Home = () => {
         </Menu>
       </LayoutSider>
       <Layout>
-        <LayoutHeader style="{ background: '#fff', padding: 0 }" />
-        <LayoutContent style="{ margin: '24px 16px 0' }">
-          <div style="{ padding: '24px', background: '#fff', minHeight: '360px' }">content</div>
+        <LayoutHeader class="layout-header" />
+        <LayoutContent class="layout-content">
+          <div class="layout-content-div">content</div>
         </LayoutContent>
         <LayoutFooter style="text-align: center">Ant Design ©2018 Created by Ant UED</LayoutFooter>
       </Layout>
