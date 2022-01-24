@@ -1,6 +1,6 @@
-import { Form, FormItem, Input, Button, message } from 'ant-design-vue';
+import { Form, FormItem, Input, Button, Card } from 'ant-design-vue';
 import { useForm } from 'ant-design-vue/lib/form';
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive } from 'vue';
 
 const Login = () => {
   const userRef = reactive({
@@ -12,18 +12,19 @@ const Login = () => {
     username: [
       {
         required: true,
-        message: 'Please input username',
+        message: '请输入用户名',
       },
     ],
     password: [
       {
         required: true,
-        message: 'Please input password',
+        message: '请输入密码',
       },
     ],
   });
 
-  const { validate, validateInfos } = useForm(userRef, rulesRef);
+  const from = useForm(userRef, rulesRef);
+  const { validate, validateInfos } = from;
 
   const handleSubmit = async (value: any) => {
     validate()
@@ -36,28 +37,32 @@ const Login = () => {
       });
   };
 
+  const handleReset = async () => {
+    from.resetFields({ username: '', password: '' });
+  };
+
   /**
    * setup
    */
   return () => (
-    <Form
-      v-model={userRef}
-      label-col={{ span: 8 }}
-      wrapper-col={{ span: 16 }}
-      onSubmit={handleSubmit}
-    >
-      <FormItem label="用户名" name="username" {...validateInfos.username}>
-        <Input v-model:value={userRef.username}></Input>
-      </FormItem>
-      <FormItem label="密码" name="password" {...validateInfos.password}>
-        <Input v-model:value={userRef.password}></Input>
-      </FormItem>
-      <FormItem>
-        <Button type="primary" htmlType="submit">
-          确定
-        </Button>
-      </FormItem>
-    </Form>
+    <Card>
+      <Form label-col={{ span: 8 }} wrapper-col={{ span: 8 }} onSubmit={handleSubmit}>
+        <FormItem label="用户名" name="username" {...validateInfos.username}>
+          <Input v-model:value={userRef.username}></Input>
+        </FormItem>
+        <FormItem label="密码" name="password" {...validateInfos.password}>
+          <Input v-model:value={userRef.password}></Input>
+        </FormItem>
+        <FormItem wrapper-col={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit">
+            确定
+          </Button>
+          <Button style="margin-left: 40px" onClick={handleReset}>
+            重置
+          </Button>
+        </FormItem>
+      </Form>
+    </Card>
   );
 };
 
