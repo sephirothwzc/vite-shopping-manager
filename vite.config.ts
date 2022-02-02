@@ -12,4 +12,10 @@ export default defineConfig({
     }),
     vueJsx(),
   ],
+  server: {
+    proxy: {
+      // 字符串简写方式
+      '/v1/api/': 'http://localhost:8080/',
+    },
+  },
 });

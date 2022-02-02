@@ -1,8 +1,14 @@
-import { Form, FormItem, Input, Button, message } from 'ant-design-vue';
+import { Form, FormItem, Input, Button } from 'ant-design-vue';
 import { useForm } from 'ant-design-vue/lib/form';
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive } from 'vue';
+import service from '../utils/axios-helper';
+import { useAppStore } from '../stores/app';
+import { useRouter } from 'vue-router';
+const userStore = useAppStore();
 
 const Login = () => {
+  const router = useRouter();
+
   const userRef = reactive({
     username: 'admin',
     password: '123456',
@@ -27,9 +33,14 @@ const Login = () => {
 
   const handleSubmit = async (value: any) => {
     validate()
-      .then(() => {
-        console.log(value);
-        console.log(userRef);
+      .then(() =>
+        service.get<{ id: string }>(
+          `/v1/api/app-user/login?username=${userRef.username}&password=${userRef.password}`
+        )
+      )
+      .then(({ data }) => {
+        userStore.increment(data);
+        router.push('/index');
       })
       .catch((error) => {
         console.log(error);

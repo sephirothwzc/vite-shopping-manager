@@ -1,7 +1,6 @@
 import { defineComponent } from 'vue';
 
-export default defineComponent({
-  setup(props) {
-    return () => <div>Hello,index</div>;
-  },
-});
+const Home = () => {
+  return () => <div>Hello,index</div>;
+};
+export default defineComponent(Home);
