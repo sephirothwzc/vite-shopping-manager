@@ -3339,6 +3339,11 @@ vue-demi@*:
   resolved "https://registry.npmmirror.com/vue-demi/-/vue-demi-0.12.1.tgz#f7e18efbecffd11ab069d1472d7a06e319b4174c"
   integrity sha512-QL3ny+wX8c6Xm1/EZylbgzdoDolye+VpCXRhI2hug9dJTP3OUJ3lmiKN3CsVV3mOJKwFi0nsstbgob0vG7aoIw==
 
+vue-request@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.npmmirror.com/vue-request/-/vue-request-1.2.4.tgz#02ab150cc2903605464e6efcb501c480d9dd536f"
+  integrity sha512-i+i+6Fog6F8EtYUeueumzKS9Sg06CvjsMXH8TK0YSBxY4sDxIJ+snTEke5rLqiV9d19DTuJOxPQFjTBUpsMtXA==
+
 vue-router@4:
   version "4.0.12"
   resolved "https://registry.npmmirror.com/vue-router/-/vue-router-4.0.12.tgz#8dc792cddf5bb1abcc3908f9064136de7e13c460"

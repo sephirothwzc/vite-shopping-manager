@@ -27,18 +27,17 @@ service.interceptors.request.use(
 // http response 拦截器
 service.interceptors.response.use(
   (response) => {
-    debugger;
     //接收返回数据..
     const res = response.data;
     //判断返回数据是否存在状态code和错误提示信息..
-    if (!res.code || !res.data) {
-      return showMessage('响应数据格式错误');
-    }
+    // if (!res?.code || !res?.data || !res?._embedded) {
+    //   return showMessage('响应数据格式错误');
+    // }
     //判断状态code是否为指定数值(200)..
-    if (res.code != 200) {
+    if (res?.code !== 200 && res?.msg) {
       return showMessage(res.msg);
     }
-    return res;
+    return response;
   },
   (err) => {
     return showMessage(err.message);
@@ -55,3 +54,32 @@ const showMessage = (msg: any) => {
   return Promise.reject(msg);
 };
 export default service;
+
+export type APIResult<T> = {
+  code: string;
+  msg: string;
+  data: T;
+};
+
+export type APIRestResult<T> = {
+  _embedded: {
+    [k: string]: T;
+  };
+  _links: {
+    self: {
+      href: 'http://localhost:8080/api/app-user?size=10';
+    };
+    profile: {
+      href: 'http://localhost:8080/api/profile/app-user';
+    };
+    search: {
+      href: 'http://localhost:8080/api/app-user/search';
+    };
+  };
+  page: {
+    size: 10;
+    totalElements: 1;
+    totalPages: 1;
+    number: 0;
+  };
+};

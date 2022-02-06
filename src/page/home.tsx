@@ -7,8 +7,9 @@ import {
   Menu,
   MenuItem,
 } from 'ant-design-vue';
-import { defineComponent } from 'vue';
+import { defineComponent, h } from 'vue';
 import { UserOutlined, VideoCameraOutlined, UploadOutlined } from '@ant-design/icons-vue';
+import { navRouter } from '../route/index';
 import './home.less';
 
 const Home = () => {
@@ -30,28 +31,20 @@ const Home = () => {
       >
         <div class="logo" />
         <Menu theme="dark" mode="inline">
-          <MenuItem key="1">
-            <UserOutlined />
-            <span class="nav-text">nav 1</span>
-          </MenuItem>
-          <MenuItem key="2">
-            <VideoCameraOutlined />
-            <span class="nav-text">nav 2</span>
-          </MenuItem>
-          <MenuItem key="3">
-            <UploadOutlined />
-            <span class="nav-text">nav 3</span>
-          </MenuItem>
-          <MenuItem key="4">
-            <UploadOutlined />
-            <span class="nav-text">nav 4</span>
-          </MenuItem>
+          {navRouter.map((p, index) => (
+            <router-link to={p.to}>
+              <MenuItem key={index}>
+                {h(p.name)}
+                <span class="nav-text">{p.name}</span>
+              </MenuItem>
+            </router-link>
+          ))}
         </Menu>
       </LayoutSider>
       <Layout>
         <LayoutHeader class="layout-header" />
         <LayoutContent class="layout-content">
-          <div class="layout-content-div">content</div>
+          <router-view />
         </LayoutContent>
         <LayoutFooter style="text-align: center">Ant Design ©2018 Created by Ant UED</LayoutFooter>
       </Layout>
