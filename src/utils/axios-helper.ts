@@ -6,7 +6,11 @@ const userStore = useAppStore();
 const service = axios.create({
   timeout: 5000, //超时时间
   baseURL: import.meta.env.BASE_URL, // 我们在请求接口的时候就不同写前面 会自动我们补全
-  transformRequest: (data) => qs.stringify(data), //post请求参数处理,防止post请求跨域
+  // transformRequest: (data) => qs.stringify(data), //post请求参数处理,防止post请求跨域
+  headers: {
+    Accept: 'application/prs.hal-forms+json, application/hal+json, application/json, */*',
+    'Content-Type': 'application/json; charset=UTF-8',
+  },
 });
 // http request 拦截器
 service.interceptors.request.use(

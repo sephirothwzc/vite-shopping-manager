@@ -1,4 +1,5 @@
 import {
+  Breadcrumb,
   Layout,
   LayoutContent,
   LayoutFooter,
@@ -6,10 +7,11 @@ import {
   LayoutSider,
   Menu,
   MenuItem,
+  PageHeader,
 } from 'ant-design-vue';
 import { defineComponent, h } from 'vue';
 import { UserOutlined, VideoCameraOutlined, UploadOutlined } from '@ant-design/icons-vue';
-import { navRouter } from '../route/index';
+import { breadcrumb, navRouter } from '../route/index';
 import './home.less';
 
 const Home = () => {
@@ -44,6 +46,7 @@ const Home = () => {
       <Layout>
         <LayoutHeader class="layout-header" />
         <LayoutContent class="layout-content">
+          <Breadcrumb routes={breadcrumb} />
           <router-view />
         </LayoutContent>
         <LayoutFooter style="text-align: center">Ant Design ©2018 Created by Ant UED</LayoutFooter>
