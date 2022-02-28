@@ -7,7 +7,6 @@ import {
   LayoutSider,
   Menu,
   MenuItem,
-  PageHeader,
 } from 'ant-design-vue';
 import { defineComponent, h } from 'vue';
 import { UserOutlined, VideoCameraOutlined, UploadOutlined } from '@ant-design/icons-vue';

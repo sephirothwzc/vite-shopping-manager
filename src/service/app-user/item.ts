@@ -5,6 +5,7 @@ export interface FormState {
   code: string;
   nickname: string;
   realname: string;
+  phone: string;
 }
 
 export const queryData = (id: string): Promise<AxiosResponse<FormState>> => {
