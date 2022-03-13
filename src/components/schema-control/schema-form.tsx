@@ -1,9 +1,9 @@
 import { Maybe } from '@/utils/ts-helper';
 import { useExpose } from '@/utils/use-expose';
-import { Button, Form, InputNumberProps, Skeleton, Spin } from 'ant-design-vue';
-import { FormItem } from 'ant-design-vue/lib/form';
+import { Button, Col, Form, Row, Skeleton, Spin } from 'ant-design-vue';
+import { FormItem, FormItemProps } from 'ant-design-vue/lib/form';
 import { Props } from 'ant-design-vue/lib/form/useForm';
-import { computed, defineComponent, PropType, reactive, toRaw } from 'vue';
+import { computed, defineComponent, h, PropType, reactive, toRaw } from 'vue';
 import SchemaFormItem from './schema-form-item';
 const useForm = Form.useForm;
 
@@ -70,6 +70,15 @@ type InputProps = {
    * 是否显示清空按钮
    */
   allowClear: boolean;
+};
+
+export type ButtonItemProps = {
+  type: 'primary' | 'ghost' | 'dashed' | 'link' | 'text' | 'default';
+  /**
+   * 图标类型
+   */
+  slots: { icon: () => any };
+  onClick: () => void;
 };
 
 type ImageUploadProps = {
@@ -158,6 +167,7 @@ export type SchemaFormItemSettingType<T extends {} = {}> = {
    * 控件类型
    */
   controlType:
+    | 'MdEditor'
     | 'Input'
     | 'Password'
     | 'CheckboxGroup'
@@ -171,6 +181,7 @@ export type SchemaFormItemSettingType<T extends {} = {}> = {
     | 'Textarea'
     | 'Button'
     | 'Submit'
+    | 'SubmitRest'
     | 'ImageUpload'
     | 'DatePicker'
     | 'TimePicker'
@@ -187,7 +198,7 @@ export type SchemaFormItemSettingType<T extends {} = {}> = {
   /**
    * 其他属性 解构使用 用于form-item
    */
-  propertyObject?: InputNumberProps;
+  propertyObject?: FormItemProps;
   /**
    * controler property  例如：onChange=()=>{}
    */
@@ -199,6 +210,7 @@ export type SchemaFormItemSettingType<T extends {} = {}> = {
     | RangePickerProps
     | CascaderProps
     | TransferProps
+    | ButtonItemProps
     | { [k: string]: any }
   >;
   /**
@@ -243,17 +255,21 @@ export type SchemaFType<T extends {} = {}> = {
    */
   autocomplete?: 'off' | 'on';
   /**
-   * default 8
+   * default {span: 4}
    */
-  labelColSpan?: number;
+  labelCol?: { span?: number; offset?: number };
   /**
-   * default 16
+   * default {span: 8, offset: 12}
    */
-  wrapperColSpan?: number;
+  wrapperCol?: { span?: number; offset?: number };
   /**
    * 表单布局 default horizontal
    */
   layout?: 'horizontal' | 'vertical' | 'inline';
+  /**
+   * 搜索 栅格布局 默认 6 分4栏
+   */
+  rowCol?: number;
   /**
    * 提交表单且数据验证成功后回调事件
    */
@@ -298,6 +314,7 @@ const SchemaForm = defineComponent({
     schema: { type: Object as PropType<SchemaFType>, required: true },
     transitionLoadProps: Object as PropType<TransitionLoadPropsType>,
   },
+  expose: ['resetFields', 'onSubmit'],
   setup(props, { emit }) {
     // useForm
     // form model
@@ -306,6 +323,10 @@ const SchemaForm = defineComponent({
     const { resetFields, validate, validateInfos } = useForm(formValue, ruleRefs, {
       onValidate: (...args) => console.log(...args),
     });
+    /**
+     *
+     * @returns
+     */
     const onSubmit = async () => {
       return validate()
         .then(() => {
@@ -318,18 +339,91 @@ const SchemaForm = defineComponent({
         });
     };
 
+    const onRest = () => {
+      resetFields();
+    };
+
     useExpose({
       resetFields,
+      onSubmit,
     });
 
     const formItemLayout = computed(() => {
       return props.schema.layout === 'horizontal'
         ? {
-            labelCol: { span: props.schema.labelColSpan },
-            wrapperCol: { span: props.schema.wrapperColSpan },
+            labelCol: props.schema.labelCol || { span: 4 }, // { span: props.schema.labelColSpan || 4 },
+            wrapperCol: props.schema.wrapperCol || { span: 8 }, // { span: props.schema.wrapperColSpan || 8 },
           }
         : {};
     });
+
+    /**
+     * 获得item
+     */
+    const findFormItem = () => {
+      const childrenItems = props.schema.formItems?.map((p) => {
+        // 布局设置
+        if (props.schema.layout === 'horizontal') {
+          if (!p.propertyObject) {
+            p.propertyObject = {};
+          }
+          p.propertyObject.labelCol = props.schema.labelCol || { span: 4 };
+          p.propertyObject.wrapperCol = props.schema.wrapperCol || { span: 8 };
+        }
+        let item: any = null;
+        /**
+         * 是否联动组件
+         */
+        if (p.keyId && p.ProFormDependency) {
+          const show = p.ProFormDependency(formValue[p.keyId], formValue);
+          if (!show) {
+            return null;
+          }
+        }
+        // 组织 form item
+        if (p.controlType === 'Submit') {
+          item = (
+            <FormItem wrapper-col={{ offset: 8, span: 16 }}>
+              <Button type="primary" onClick={onSubmit}>
+                {p.label || '提交'}
+              </Button>
+            </FormItem>
+          );
+        } else if (p.controlType === 'SubmitRest') {
+          item = (
+            <FormItem wrapper-col={{ offset: 8, span: 16 }}>
+              <Button type="primary" onClick={onSubmit}>
+                {p.label || '提交'}
+              </Button>
+              <Button style="margin-left: 20px" onClick={onRest}>
+                重置
+              </Button>
+            </FormItem>
+          );
+        } else if (p.keyId) {
+          item = (
+            <SchemaFormItem
+              getFormValue={() => formValue}
+              item={p}
+              rules={validateInfos[p.rulesKey || p.keyId]}
+              v-model={formValue[p.keyId]}
+            ></SchemaFormItem>
+          );
+        } else {
+          item = <SchemaFormItem getFormValue={() => formValue} item={p}></SchemaFormItem>;
+        }
+        // 组织布局
+        if (props.schema.rowCol) {
+          return h(Col, { span: props.schema.rowCol }, () => item);
+        }
+        return item;
+      });
+      // 生成 行
+      if (props.schema.rowCol) {
+        return h(Row, { gutter: 24 }, () => childrenItems);
+      }
+      return childrenItems;
+    };
 
     return () => (
       <Skeleton
@@ -337,39 +431,13 @@ const SchemaForm = defineComponent({
         loading={props.transitionLoadProps?.skeletonLoading === true}
         paragraph={{ rows: props.transitionLoadProps?.skeletonRows || 8 }}
       >
-        <Spin spinning={props.transitionLoadProps?.spinning}>
-          <Form name={props.schema.formName} layout={props.schema.layout} {...formItemLayout}>
-            {props.schema.formItems?.map((p) => {
-              /**
-               * 是否联动组件
-               */
-              if (p.keyId && p.ProFormDependency) {
-                const show = p.ProFormDependency(formValue[p.keyId], formValue);
-                if (!show) {
-                  return null;
-                }
-              }
-              if (p.controlType === 'Submit') {
-                return (
-                  <FormItem wrapper-col={{ offset: 8, span: 16 }}>
-                    <Button type="primary" onClick={onSubmit}>
-                      {p.label || '提交'}
-                    </Button>
-                  </FormItem>
-                );
-              } else if (p.keyId) {
-                return (
-                  <SchemaFormItem
-                    getFormValue={() => formValue}
-                    item={p}
-                    rules={validateInfos[p.rulesKey || p.keyId]}
-                    v-model={formValue[p.keyId]}
-                  ></SchemaFormItem>
-                );
-              } else {
-                return <SchemaFormItem getFormValue={() => formValue} item={p}></SchemaFormItem>;
-              }
-            })}
+        <Spin spinning={props.transitionLoadProps?.spinning === true}>
+          <Form
+            name={props.schema.formName}
+            layout={props.schema.layout as any}
+            {...formItemLayout}
+          >
+            {findFormItem}
           </Form>
         </Spin>
       </Skeleton>
@@ -377,6 +445,13 @@ const SchemaForm = defineComponent({
   },
 });
 export type SchemaFormType = typeof SchemaForm & {
+  /**
+   * 表单清空
+   */
   resetFields: (newValues?: Props | undefined) => void;
+  /**
+   * 提交 to handleFinish
+   */
+  onSubmit: () => Promise<any>;
 };
 export default SchemaForm;

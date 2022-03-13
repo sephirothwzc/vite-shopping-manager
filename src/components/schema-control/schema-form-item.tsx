@@ -25,6 +25,8 @@ import { defineComponent, ref, PropType, toRefs, watch } from 'vue';
 import ImageUpload from './image-upload';
 import type { SchemaFormItemSettingType } from './schema-form';
 import styles from './schema-form-item.module.less';
+import MdEditor from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 type ModelValue = Object | String | Number | Boolean | Array<UploadFile> | Dayjs;
 
@@ -72,6 +74,15 @@ const SchemaFormItem = defineComponent({
       return () => (
         <FormItem label={item.value.label} {...(item.value.propertyObject, props.rules)}>
           <InputNumber {...item.value.controlPropery} v-model:value={itemValue.value}></InputNumber>
+        </FormItem>
+      );
+    } else if (item.value?.controlType === 'MdEditor') {
+      return () => (
+        <FormItem label={item.value.label} {...(item.value.propertyObject, props.rules)}>
+          <MdEditor
+            modelValue={String(itemValue.value)}
+            onChange={(v: string) => (itemValue.value = v)}
+          />
         </FormItem>
       );
     } else if (item.value?.controlType === 'Button') {

@@ -51,6 +51,12 @@ const routerData = [
         component: () => import('../view/shopping-goods/list'),
       },
       {
+        path: 'shopping-goods/item',
+        name: 'shoppingGoodsAdd',
+        breadcrumbName: '商品新增',
+        component: () => import('../view/shopping-goods/item'),
+      },
+      {
         path: 'app-user',
         name: 'appUser',
         breadcrumbName: '用户管理',
@@ -90,6 +96,11 @@ export const navRouter = [
     to: '/web/shopping-goods',
     icon: 'UserOutlined',
     name: '商品管理',
+  },
+  {
+    to: '/web/shopping-goods/item',
+    icon: 'UserOutlined',
+    name: '商品新增',
   },
   {
     to: '/web/shopping-goods',

@@ -1,83 +1,133 @@
-import { computed, defineComponent, FunctionalComponent } from 'vue';
-import { Table, TableProps } from 'ant-design-vue';
-import { usePagination } from 'vue-request';
+import { defineComponent } from 'vue';
 import service, { APIResult } from '../../utils/axios-helper';
-
-const columns = [
-  {
-    title: '商品编号',
-    dataIndex: 'code',
-    sorter: true,
-  },
-  {
-    title: '商品名称',
-    dataIndex: 'goodsName',
-    sorter: true,
-  },
-  {
-    title: '商品分类',
-    dataIndex: 'goodsName',
-    sorter: true,
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-  },
-];
-
-type APIParams = {
-  results: number;
-  page?: number;
-  sortField?: string;
-  sortOrder?: number;
-  [key: string]: any;
-};
-
-const queryData = (params: APIParams) => {
-  return service.get<APIResult<Array<any>>>('/api/mall-goods', { params });
-};
+import SchemaTable, {
+  APIParams,
+  BodyCellType,
+  SchemaTablePropOptionType,
+} from '@/components/schema-control/schema-table';
+import { MallGoodsType } from '@/service/shopping-goods';
+import { Button, message, Popconfirm } from 'ant-design-vue';
+import { APIPageResult } from '@/utils/ts-helper';
+import { pickBy } from 'lodash';
+import { findSearchParams } from '@/utils/antd-helper';
 
 /**
  * 商品管理
  * @returns
  */
-const List: FunctionalComponent = () => {
-  const {
-    data: dataSource,
-    run,
-    loading,
-    current,
-    pageSize,
-  } = usePagination(queryData, {
-    formatResult: (res) => res.data.data,
-    pagination: {
-      currentKey: 'page',
-      pageSizeKey: 'results',
-    },
-  });
+const List = defineComponent({
+  props: {},
+  setup() {
+    const renderBody: BodyCellType<MallGoodsType> = ({ text, record, index, column }) => {
+      if (column.key === 'operation') {
+        return (
+          <span>
+            <Button type="link">修改</Button>
+            <Popconfirm
+              title="确定要删除吗？"
+              okText="确定"
+              cancelText="取消"
+              onConfirm={() => deleteItem(record)}
+            >
+              <Button type="link">删除</Button>
+            </Popconfirm>
+          </span>
+        );
+      } else {
+        return text;
+      }
+    };
 
-  const pagination = computed(() => ({
-    total: 200,
-    current: current.value,
-    pageSize: pageSize.value,
-  }));
+    /**
+     * 删除
+     * @param record
+     */
+    const deleteItem = (record: MallGoodsType) => {
+      message.success(`${record.goodsName}删除成功！`);
+    };
 
-  const handleTableChange: TableProps['onChange'] = (
-    pag: { pageSize?: any; current?: any },
-    filters: any,
-    sorter: any
-  ) => {};
+    const option: SchemaTablePropOptionType<MallGoodsType> = {
+      columns: [
+        {
+          title: '商品分类',
+          dataIndex: 'goodsType',
+          key: 'goodsType',
+          /**
+           * 允许拖拽 需要设置 列宽度
+           */
+          // resizable: true,
+          formItem: {
+            controlType: 'Input',
+            keyId: 'goodsType',
+            label: '商品分类',
+          },
+        },
+        {
+          title: '商品名称',
+          dataIndex: 'goodsName',
+          key: 'goodsName',
+          formItem: {
+            controlType: 'Input',
+          },
+        },
+        {
+          title: '商品标签',
+          dataIndex: 'goodsTag',
+          key: 'goodsTag',
+          sorter: false,
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createdAt',
+          formItem: {
+            controlType: 'DatePicker',
+            label: '日期',
+            keyId: 'createdAt',
+          },
+          advanced: true,
+        },
+        /**
+         * 操作固定右侧
+         */
+        {
+          title: '操作',
+          key: 'operation',
+          fixed: 'right',
+          sorter: false,
+          width: 200,
+        },
+      ],
+      slots: {
+        bodyCell: renderBody,
+      },
+      rowKey: 'id',
+      queryData: (params: APIParams) => {
+        const search = pickBy(params.filters, (p) => p);
+        return service
+          .get('/api/mall-goods/page', {
+            params: findSearchParams({
+              search,
+              page: params.current - 1,
+              size: params.pageSize,
+              sort: params.sortField,
+              descend: params.sortOrder,
+            }),
+          })
+          .then((res) => {
+            return res.data;
+          });
+      },
+      formatResult: (res: APIPageResult<MallGoodsType>) => {
+        return { data: res.content, total: res.totalElements };
+      },
+    };
 
-  // const pagination = computed(() => pagination);
-  return () => (
-    <Table
-      columns={columns}
-      row-key={(record: any) => record.id}
-      data-source="dataSource"
-      pagination={pagination as any}
-      loading={loading.value}
-      onChange={handleTableChange}
-    ></Table>
-  );
-};
-export default defineComponent(List);
+    // const pagination = computed(() => pagination);
+    return () => (
+      <div>
+        <SchemaTable option={option as any}></SchemaTable>
+      </div>
+    );
+  },
+});
+export default List;
