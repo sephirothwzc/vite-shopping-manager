@@ -3,14 +3,6 @@
  */
 export type Maybe<T> = null | undefined | T;
 
-export type APIParams = {
-  results: number;
-  page?: number;
-  sortField?: string;
-  sortOrder?: number;
-  [key: string]: any;
-};
-
 export type APIPageResult<T> = {
   content: Array<T>;
   empty: true;
