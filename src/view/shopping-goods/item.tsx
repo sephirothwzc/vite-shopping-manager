@@ -14,7 +14,10 @@ export type itemPropsType = {};
  * 保存
  * @param value
  */
-const runSave = (value: MallGoodsType) => {
+const runSave = (value: MallGoodsType, id?: Maybe<string>) => {
+  if (id) {
+    return service.put(`/api/mall-goods/${id}`, value);
+  }
   return service.post('/api/mall-goods', value);
 };
 
@@ -44,7 +47,7 @@ const Item = defineComponent({
     watch(data, () => schemaFromRef.value?.setFormFields?.(data.value?.data));
 
     const handleFinish = (value: MallGoodsType) => {
-      run(value).then((res) => {
+      run(value, String(id)).then((res) => {
         message.success('保存成功！');
       });
     };

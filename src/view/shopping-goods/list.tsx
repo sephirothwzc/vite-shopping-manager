@@ -8,7 +8,7 @@ import SchemaTable, {
 import { MallGoodsType } from '@/service/shopping-goods';
 import { Button, message, Popconfirm } from 'ant-design-vue';
 import { APIPageResult } from '@/utils/ts-helper';
-import { pickBy } from 'lodash';
+import { pickBy, toNumber } from 'lodash';
 import { findSearchParams } from '@/utils/antd-helper';
 import { useRouter } from 'vue-router';
 
@@ -116,7 +116,7 @@ const List = defineComponent({
           .get('/api/mall-goods/page', {
             params: findSearchParams({
               search,
-              page: params.current - 1,
+              page: toNumber(params.current) - 1,
               size: params.pageSize,
               sort: params.sortField,
               descend: params.sortOrder,

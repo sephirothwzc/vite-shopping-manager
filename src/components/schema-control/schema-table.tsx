@@ -24,14 +24,14 @@ export type APIParams = {
   /**
    * 行数
    */
-  current: number;
+  current?: number;
   /**
    * 当前页数
    */
   pageSize?: number;
   sortField?: string;
   sortOrder?: number | string;
-  filters: { [k: string]: any };
+  filters?: { [k: string]: any };
 };
 
 /**
@@ -170,6 +170,11 @@ const SchemaTable = defineComponent({
       current,
       pageSize,
     } = usePagination(props.option.queryData, {
+      defaultParams: [
+        {
+          pageSize: 8,
+        },
+      ],
       formatResult: props.option.formatResult ? props.option.formatResult : (res) => res,
     });
     const pagination = computed(() => ({
