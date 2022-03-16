@@ -57,6 +57,24 @@ const routerData = [
         component: () => import('../view/shopping-goods/item'),
       },
       {
+        path: 'shopping-goods/item/:id',
+        name: 'shoppingGoodsEdit',
+        breadcrumbName: '商品修改',
+        component: () => import('../view/shopping-goods/item'),
+      },
+      {
+        path: 'shopping-price',
+        name: 'shoppingPrice',
+        breadcrumbName: '商品价格',
+        component: () => import('../view/shopping-details/list'),
+      },
+      {
+        path: 'shopping-price/item/:id',
+        name: 'shoppingPriceEdit',
+        breadcrumbName: '商品价格',
+        component: () => import('../view/shopping-details/item'),
+      },
+      {
         path: 'app-user',
         name: 'appUser',
         breadcrumbName: '用户管理',
@@ -81,6 +99,11 @@ const routerData = [
     name: 'login',
     component: () => import('../page/login'),
   },
+  {
+    path: '/demo',
+    name: 'demo',
+    component: () => import('../view/demo/form-demo'),
+  },
 ];
 
 const router = createRouter({
@@ -101,6 +124,11 @@ export const navRouter = [
     to: '/web/shopping-goods/item',
     icon: 'UserOutlined',
     name: '商品新增',
+  },
+  {
+    to: '/web/shopping-price',
+    icon: 'UserOutlined',
+    name: '商品价格',
   },
   {
     to: '/web/shopping-goods',

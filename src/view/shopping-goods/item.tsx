@@ -3,8 +3,9 @@ import { MallGoodsType } from '@/service/shopping-goods';
 import service from '@/utils/axios-helper';
 import { Maybe } from '@/utils/ts-helper';
 import { message } from 'ant-design-vue';
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import { useRequest } from 'vue-request';
+import { useRoute } from 'vue-router';
 import styles from './item.module.less';
 
 export type itemPropsType = {};
@@ -18,13 +19,29 @@ const runSave = (value: MallGoodsType) => {
 };
 
 /**
+ * 获取修改
+ * @param id
+ * @returns
+ */
+const runGet = (id: string) => {
+  return service.get(`/api/mall-goods/${id}`);
+};
+
+/**
  * 商品新增
  * @returns
  */
 const Item = defineComponent({
   props: {},
   setup() {
+    const { id } = useRoute().params;
     const { run, loading } = useRequest(runSave, { manual: true });
+    const { data, loading: getLoading } = useRequest(runGet, {
+      defaultParams: [String(id)],
+      manual: !id,
+    });
+
+    watch(data, () => schemaFromRef.value?.setFormFields?.(data.value?.data));
 
     const handleFinish = (value: MallGoodsType) => {
       run(value).then((res) => {
@@ -40,7 +57,11 @@ const Item = defineComponent({
         goodsType: [{ required: true, message: '请输入' }],
         goodsName: [{ required: true, message: '请输入' }],
       },
-      initValue: { goodsType: '', goodsName: '', goodsDetails: '### 我是标题' },
+      initValue: (data.value || {
+        goodsType: '',
+        goodsName: '',
+        goodsDetails: '### 我是标题',
+      }) as MallGoodsType,
       formItems: [
         {
           controlType: 'Input',

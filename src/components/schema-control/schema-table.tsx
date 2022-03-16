@@ -378,6 +378,7 @@ const SchemaTable = defineComponent({
               loading={loading.value}
               rowKey={props.option?.rowKey || 'id'}
               v-slots={props.option?.slots}
+              size="middle"
             ></Table>
           </LayoutContent>
         </Layout>

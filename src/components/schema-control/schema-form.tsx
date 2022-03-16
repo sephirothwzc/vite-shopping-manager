@@ -3,10 +3,22 @@ import { useExpose } from '@/utils/use-expose';
 import { Button, Col, Form, Row, Skeleton, Spin } from 'ant-design-vue';
 import { FormItem, FormItemProps } from 'ant-design-vue/lib/form';
 import { Props } from 'ant-design-vue/lib/form/useForm';
-import { computed, defineComponent, h, PropType, reactive, toRaw } from 'vue';
+import {
+  computed,
+  defineComponent,
+  h,
+  isReactive,
+  isRef,
+  PropType,
+  reactive,
+  toRaw,
+  watch,
+} from 'vue';
+import { keys, set, get } from 'lodash';
 import SchemaFormItem from './schema-form-item';
 const useForm = Form.useForm;
 
+// #region type
 /**
  * 日期控件
  */
@@ -302,6 +314,7 @@ type TransitionLoadPropsType = {
    */
   spinning?: boolean;
 };
+// #endregion
 
 /**
  * schema to form
@@ -314,15 +327,27 @@ const SchemaForm = defineComponent({
     schema: { type: Object as PropType<SchemaFType>, required: true },
     transitionLoadProps: Object as PropType<TransitionLoadPropsType>,
   },
-  expose: ['resetFields', 'onSubmit'],
+  expose: ['resetFields', 'onSubmit', 'setFormFields'],
   setup(props, { emit }) {
     // useForm
     // form model
-    const formValue = reactive<any>(props.schema.initValue);
+    const formProp = reactive<{ formValue: any }>({ formValue: toRaw(props.schema.initValue) });
     const ruleRefs = reactive(props.schema.ruleRefs || {});
-    const { resetFields, validate, validateInfos } = useForm(formValue, ruleRefs, {
-      onValidate: (...args) => console.log(...args),
+    const { resetFields, validate, validateInfos } = useForm(formProp.formValue, ruleRefs, {
+      onValidate: (...args) => {
+        console.log(...args);
+      },
     });
+
+    /**
+     * 设置form表单对象的值 不能直接替换对象，会导致useForm的引用失效。
+     * @param value
+     */
+    const setFormFields = (value: any) => {
+      keys(formProp.formValue).forEach((p) => {
+        set(formProp.formValue, p, get(value, p));
+      });
+    };
     /**
      *
      * @returns
@@ -330,7 +355,7 @@ const SchemaForm = defineComponent({
     const onSubmit = async () => {
       return validate()
         .then(() => {
-          const value = toRaw(formValue);
+          const value = toRaw(formProp.formValue);
           return props.schema?.handleFinish?.(value) || emit('handleFinish', value);
         })
         .catch((err) => {
@@ -344,6 +369,7 @@ const SchemaForm = defineComponent({
     };
 
     useExpose({
+      setFormFields,
       resetFields,
       onSubmit,
     });
@@ -375,7 +401,7 @@ const SchemaForm = defineComponent({
          * 是否联动组件
          */
         if (p.keyId && p.ProFormDependency) {
-          const show = p.ProFormDependency(formValue[p.keyId], formValue);
+          const show = p.ProFormDependency(formProp.formValue[p.keyId], formProp.formValue);
           if (!show) {
             return null;
           }
@@ -403,14 +429,16 @@ const SchemaForm = defineComponent({
         } else if (p.keyId) {
           item = (
             <SchemaFormItem
-              getFormValue={() => formValue}
+              getFormValue={() => formProp.formValue}
               item={p}
               rules={validateInfos[p.rulesKey || p.keyId]}
-              v-model={formValue[p.keyId]}
+              v-model={formProp.formValue[p.keyId]}
+              // modelValue={get(toRaw(formProp.formValue), String(p.keyId))}
+              // onChange={(v) => set(formProp.formValue, String(p.keyId), v)}
             ></SchemaFormItem>
           );
         } else {
-          item = <SchemaFormItem getFormValue={() => formValue} item={p}></SchemaFormItem>;
+          item = <SchemaFormItem getFormValue={() => formProp.formValue} item={p}></SchemaFormItem>;
         }
         // 组织布局
         if (props.schema.rowCol) {
@@ -445,6 +473,10 @@ const SchemaForm = defineComponent({
   },
 });
 export type SchemaFormType = typeof SchemaForm & {
+  /**
+   * 设置form fields
+   */
+  setFormFields: (value: any) => void;
   /**
    * 表单清空
    */

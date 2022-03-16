@@ -21,7 +21,7 @@ import {
 } from 'ant-design-vue';
 import { UploadFile } from 'ant-design-vue/lib/upload/interface';
 import { Dayjs } from 'dayjs';
-import { defineComponent, ref, PropType, toRefs, watch } from 'vue';
+import { defineComponent, ref, PropType, toRefs, watch, toRaw } from 'vue';
 import ImageUpload from './image-upload';
 import type { SchemaFormItemSettingType } from './schema-form';
 import styles from './schema-form-item.module.less';
@@ -50,12 +50,17 @@ const SchemaFormItem = defineComponent({
      */
     getFormValue: { type: Function as PropType<<T>() => T>, required: true },
   },
+  emits: ['change', 'update:modelValue'],
   setup(props, { emit }) {
     const { item } = toRefs(props);
     const itemValue = ref(props.modelValue);
     watch(itemValue, () => {
-      emit('update:modelValue', itemValue.value);
+      emit('update:modelValue', toRaw(itemValue.value));
+      emit('change', toRaw(itemValue.value));
     });
+    /**
+     * 独立数据源
+     */
     watch(
       () => props.modelValue,
       (value) => {

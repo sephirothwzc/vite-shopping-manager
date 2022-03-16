@@ -24,17 +24,9 @@ const List = defineComponent({
       if (column.key === 'operation') {
         return (
           <span>
-            <Button type="link" onClick={() => router.push(`shopping-goods/item/${record.id}`)}>
-              修改
+            <Button type="link" onClick={() => router.push(`shopping-price/item/${record.id}`)}>
+              价格维护
             </Button>
-            <Popconfirm
-              title="确定要删除吗？"
-              okText="确定"
-              cancelText="取消"
-              onConfirm={() => deleteItem(record)}
-            >
-              <Button type="link">删除</Button>
-            </Popconfirm>
           </span>
         );
       } else {
