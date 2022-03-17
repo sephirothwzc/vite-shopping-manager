@@ -1,0 +1,80 @@
+import { Form, FormItem, Input, Button, Card } from 'ant-design-vue';
+import { useForm } from 'ant-design-vue/lib/form';
+import { defineComponent, reactive } from 'vue';
+import service from '../utils/axios-helper';
+import { useAppStore } from '../stores/app';
+import { useRouter } from 'vue-router';
+const userStore = useAppStore();
+
+const Login = () => {
+  const router = useRouter();
+
+  const userRef = reactive({
+    username: 'admin',
+    password: '123456',
+  });
+
+  const rulesRef = reactive({
+    username: [
+      {
+        required: true,
+        message: '请输入用户名',
+      },
+    ],
+    password: [
+      {
+        required: true,
+        message: '请输入密码',
+      },
+    ],
+  });
+
+  const from = useForm(userRef, rulesRef);
+  const { validate, validateInfos } = from;
+
+  const handleSubmit = async (value: any) => {
+    validate()
+      .then(() =>
+        service.get<{ id: string }>(
+          `/v1/api/app-user/login?username=${userRef.username}&password=${userRef.password}`
+        )
+      )
+      .then(({ data }) => {
+        userStore.increment(data);
+        router.push('/index');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleReset = async () => {
+    from.resetFields({ username: '', password: '' });
+  };
+
+  /**
+   * setup
+   */
+  return () => (
+    <Card>
+      <Form label-col={{ span: 8 }} wrapper-col={{ span: 8 }} onSubmit={handleSubmit}>
+        <FormItem label="用户名" name="username" {...validateInfos.username}>
+          <Input v-model:value={userRef.username}></Input>
+        </FormItem>
+        <FormItem label="密码" name="password" {...validateInfos.password}>
+          <Input v-model:value={userRef.password}></Input>
+        </FormItem>
+        <FormItem wrapper-col={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit">
+            确定
+          </Button>
+          <Button style="margin-left: 40px" onClick={handleReset}>
+            重置
+          </Button>
+        </FormItem>
+      </Form>
+    </Card>
+  );
+};
+
+export default defineComponent(Login);
