@@ -51,13 +51,14 @@ export type MallGoodsSpecificationsType = {
  * @param params
  * @returns
  */
-export const getListByMallGoodsId = (mallGoodsId: string, params: APIParams) => {
+export const getListByMallGoodsId = async (mallGoodsId: string, params: APIParams) => {
   const search = pickBy(params.filters, (p) => p);
   if (mallGoodsId) {
     search.mallGoodsId = mallGoodsId;
   }
-  return service
-    .get<Array<MallGoodsSpecificationsType>>('/api/mall-goods-specifications/page', {
+  const res = await service.get<Array<MallGoodsSpecificationsType>>(
+    '/api/mall-goods-specifications/page',
+    {
       params: findSearchParams({
         search,
         page: toNumber(params.current) - 1,
@@ -65,8 +66,7 @@ export const getListByMallGoodsId = (mallGoodsId: string, params: APIParams) => 
         sort: params.sortField,
         descend: params.sortOrder,
       }),
-    })
-    .then((res) => {
-      return res.data;
-    });
+    }
+  );
+  return res.data;
 };
