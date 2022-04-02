@@ -1,5 +1,5 @@
 import { pickBy, keys, omit } from 'lodash';
-
+import Flattener from 'flattener';
 /**
  * 处理分页
  * @param params
@@ -17,5 +17,18 @@ export const findSearchParams = (params: {
   if (keys(params?.search).length <= 0) {
     return omit(params, 'search');
   }
+  // 对象拼接处理
+  const search = Flattener.flatten(params?.search);
+  params.search = keys(search)
+    .map((p) => `${p}:'${search[p]}'`)
+    .join(' and ');
   return params;
+};
+
+/**
+ * 默认必填约束
+ * @returns
+ */
+export const getRulesRequired = () => {
+  return [{ required: true, message: '请输入' }];
 };

@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       // 字符串简写方式
-      '/api': 'http://localhost:8080/',
+      '/api': 'http://localhost:8082/',
     },
   },
   css: {

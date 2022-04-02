@@ -1790,6 +1790,11 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
+flattener@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.npmmirror.com/flattener/-/flattener-0.4.0.tgz#6d0a22a3b8d1af950d5f1306cbe35fc95ebb6f1a"
+  integrity sha512-txMMOMvhHoIXBTxF53Exr60hpPwtIiSPlP1RLB3OAd62bqZB9P5EeoWxmuUpByJWQWWyMSPlduIE1gj3cuo3qw==
+
 follow-redirects@^1.14.7:
   version "1.14.7"
   resolved "https://registry.npmmirror.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"

@@ -1,7 +1,8 @@
 import { APIParams } from '@/components/schema-control/schema-table';
 import { findSearchParams } from '@/utils/antd-helper';
 import service from '@/utils/axios-helper';
-import { pickBy, toNumber } from 'lodash';
+import { Maybe } from '@/utils/ts-helper';
+import { pickBy, toNumber, set } from 'lodash';
 
 /**
  * 商品价格明细
@@ -54,7 +55,7 @@ export type MallGoodsSpecificationsType = {
 export const getListByMallGoodsId = async (mallGoodsId: string, params: APIParams) => {
   const search = pickBy(params.filters, (p) => p);
   if (mallGoodsId) {
-    search.mallGoodsId = mallGoodsId;
+    set(search, 'mallGoods.id', mallGoodsId);
   }
   const res = await service.get<Array<MallGoodsSpecificationsType>>(
     '/api/mall-goods-specifications/page',
@@ -69,4 +70,30 @@ export const getListByMallGoodsId = async (mallGoodsId: string, params: APIParam
     }
   );
   return res.data;
+};
+
+/**
+ * 获取修改
+ * @param id
+ * @returns
+ */
+export const runGet = (id: string) => {
+  return service
+    .get<MallGoodsSpecificationsType>(`/api/mall-goods-specifications/${id}`)
+    .then((res) => res.data);
+};
+
+/**
+ * 保存
+ * @param value
+ */
+export const runSave = (
+  value: MallGoodsSpecificationsType,
+  id?: Maybe<string>,
+  mallGoodsId?: any
+) => {
+  if (id) {
+    return service.put(`/api/mall-goods/${mallGoodsId}/mallGoodsSpecifications/${id}`, value);
+  }
+  return service.post(`/api/mall-goods/${mallGoodsId}/mallGoodsSpecifications/`, value);
 };

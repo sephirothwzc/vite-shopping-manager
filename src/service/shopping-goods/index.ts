@@ -1,3 +1,5 @@
+import { MallGoodsSpecificationsType } from '../mall-goods-specifications';
+
 /**
  * 商品
  */
@@ -46,4 +48,8 @@ export type MallGoodsType = {
    * 商品分类
    */
   goodsType?: string;
+  /**
+   * 商品价格
+   */
+  mallGoodsSpecifications?: Array<MallGoodsSpecificationsType>;
 };

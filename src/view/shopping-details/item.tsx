@@ -1,9 +1,9 @@
 import { MallGoodsType } from '@/service/shopping-goods';
 import service from '@/utils/axios-helper';
-import { Divider, Skeleton, Button, Card } from 'ant-design-vue';
+import { Divider, Skeleton, Card } from 'ant-design-vue';
 import { defineComponent } from 'vue';
 import { useRequest } from 'vue-request';
-import { useRoute } from 'vue-router';
+import { useRoute, RouterLink } from 'vue-router';
 import DetailsList from './details-list';
 
 export type ItemPropsType = {};
@@ -35,7 +35,7 @@ const Item = defineComponent({
           <Card title={data.value?.goodsName}>
             <p>商品分类：{data.value?.goodsType}</p>
             <Divider></Divider>
-            <Button type="link">新增</Button>
+            <RouterLink to={`/web/shopping-price/item/${id}/details`}>新增</RouterLink>
             <DetailsList></DetailsList>
           </Card>
         </Skeleton>
