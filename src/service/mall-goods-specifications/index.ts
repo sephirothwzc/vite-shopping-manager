@@ -93,7 +93,17 @@ export const runSave = (
   mallGoodsId?: any
 ) => {
   if (id) {
-    return service.put(`/api/mall-goods/${mallGoodsId}/mallGoodsSpecifications/${id}`, value);
+    return service.put(`/api/mall-goods-specifications/${id}`, value);
   }
-  return service.post(`/api/mall-goods/${mallGoodsId}/mallGoodsSpecifications/`, value);
+  return service.post(`/api/mall-goods-specifications/`, value).then((res) => {
+    return service.put(
+      String(res.data._links.mallGoods.href).replace(String(import.meta.env.VITE_JPA_REST_URL), ''),
+      `${import.meta.env.VITE_JPA_REST_URL}/api/mall-goods/${mallGoodsId}`,
+      {
+        headers: {
+          'Content-Type': 'text/uri-list',
+        },
+      }
+    );
+  });
 };
