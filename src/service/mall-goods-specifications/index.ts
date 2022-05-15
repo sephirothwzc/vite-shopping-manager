@@ -1,5 +1,5 @@
 import { APIParams } from '@/components/schema-control/schema-table';
-import { findSearchParams } from '@/utils/antd-helper';
+import { findSearchParams, searchToQuery } from '@/utils/antd-helper';
 import service from '@/utils/axios-helper';
 import { pickBy, toNumber } from 'lodash';
 
@@ -54,7 +54,7 @@ export type MallGoodsSpecificationsType = {
 export const getListByMallGoodsId = async (mallGoodsId: string, params: APIParams) => {
   const search = pickBy(params.filters, (p) => p);
   if (mallGoodsId) {
-    search.mallGoodsId = mallGoodsId;
+    search['mallGoods.id'] = mallGoodsId;
   }
   const res = await service.get<Array<MallGoodsSpecificationsType>>(
     '/api/mall-goods-specifications/page',

@@ -15,6 +15,7 @@ export type itemPropsType = {};
  * @param value
  */
 const runSave = (value: MallGoodsType, id?: Maybe<string>) => {
+  debugger;
   if (id) {
     return service.put(`/api/mall-goods/${id}`, value);
   }
@@ -47,7 +48,7 @@ const Item = defineComponent({
     watch(data, () => schemaFromRef.value?.setFormFields?.(data.value?.data));
 
     const handleFinish = (value: MallGoodsType) => {
-      run(value, String(id)).then((res) => {
+      run(value, id as string).then((res) => {
         message.success('保存成功！');
       });
     };

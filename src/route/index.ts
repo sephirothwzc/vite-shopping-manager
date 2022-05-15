@@ -69,6 +69,12 @@ const routerData = [
         component: () => import('../view/shopping-details/list'),
       },
       {
+        path: 'shopping-price/item/:id/item',
+        name: 'shoppingPriceEdit',
+        breadcrumbName: '商品价格',
+        component: () => import('../view/shopping-details/details-item'),
+      },
+      {
         path: 'shopping-price/item/:id',
         name: 'shoppingPriceEdit',
         breadcrumbName: '商品价格',

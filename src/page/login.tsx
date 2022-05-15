@@ -36,7 +36,7 @@ const Login = () => {
     validate()
       .then(() =>
         service.get<{ id: string }>(
-          `/v1/api/app-user/login?username=${userRef.username}&password=${userRef.password}`
+          `/api/app-user/login?username=${userRef.username}&password=${userRef.password}`
         )
       )
       .then(({ data }) => {
